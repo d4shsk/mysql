@@ -251,3 +251,47 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 - В users — поле age (INT).
 - В products — поле description (TEXT).
 - В shops — поле opening_hours (VARCHAR(45)).
+Заполнил таблицу users:  
+```sql
+INSERT INTO `mydb`.`users` (`fio`, `login`, `password`, `e_mail`, `type`, `age`) VALUES ('Виктор', 'vitek', '1111', 'vit@mail.ru', 'customer', '10');
+INSERT INTO `mydb`.`users` (`fio`, `login`, `password`, `e_mail`, `type`, `age`) VALUES ('Настасья', 'venom', '2222', 'v@ya.ru', 'customer', '100');
+INSERT INTO `mydb`.`users` (`fio`, `login`, `password`, `e_mail`, `type`, `age`) VALUES ('Никодим Лесоповал', 'les', '3333', 'les@pov.al', 'manager', '67');
+```
+Заполнил таблицу shops:  
+```sql
+INSERT INTO `mydb`.`shops` (`name`, `address`, `tel`, `email`, `opening_hours`) VALUES ('megashop', '3 street', '111', 'ms@ya.ru', '10');
+INSERT INTO `mydb`.`shops` (`name`, `address`, `tel`, `email`, `opening_hours`) VALUES ('goodshop', '2 street', '123', 'gs@ya.ru', '7');
+INSERT INTO `mydb`.`shops` (`name`, `address`, `tel`, `email`, `opening_hours`) VALUES ('badshop', '1', '333', 'bs@ya.ru', '11');
+```
+Заполнил таблицу product_type:  
+```sql
+INSERT INTO `mydb`.`product_type` (`name`) VALUES ('clothes');
+INSERT INTO `mydb`.`product_type` (`name`) VALUES ('books');
+INSERT INTO `mydb`.`product_type` (`name`) VALUES ('computers');
+```
+Заполнил таблицу products:  
+```sql
+INSERT INTO `mydb`.`products` (`shop_id`, `type_id`, `brand`, `model`, `data`, `img`, `price`, `warranty`, `description`) VALUES ('1', '1', 'unknown', '2', 'c', 'n', '7', 'no', 'хороший ');
+INSERT INTO `mydb`.`products` (`shop_id`, `type_id`, `brand`, `model`, `data`, `img`, `price`, `warranty`, `description`) VALUES ('2', '2', 'unknown', '3', 'b', 'n', '5', 'no', 'Хороший');
+INSERT INTO `mydb`.`products` (`shop_id`, `type_id`, `brand`, `model`, `data`, `img`, `price`, `warranty`, `description`) VALUES ('3', '3', 'digma', 'pro', 'a', 'n', '6', 'yes', 'Очень хороший');
+```  
+Заполнил таблицу orders:  
+```sql
+INSERT INTO `mydb`.`orders` (`shop_id`, `fio`, `date`, `quantity`, `tel`, `confirm`) VALUES ('1', 'Виктор', '2026-03-23', '1', '5', '1');
+INSERT INTO `mydb`.`orders` (`shop_id`, `fio`, `date`, `quantity`, `tel`, `confirm`) VALUES ('2', 'Настасья', '2026-03-23', '2', '6', '0');
+INSERT INTO `mydb`.`orders` (`shop_id`, `fio`, `date`, `quantity`, `tel`, `confirm`) VALUES ('3', 'Никодим Лесоповал', '2026-03-23', '3', '7', '0');
+```
+Заполнил таблицу deliveries:
+```sql
+INSERT INTO `mydb`.`deliveries` (`order_id`, `fio`, `adress`, `time`, `date`, `confirm`) VALUES ('13', 'Виктор', 'strt', '17:20:00', '2026-03-23', '1');
+INSERT INTO `mydb`.`deliveries` (`order_id`, `fio`, `adress`, `time`, `date`, `confirm`) VALUES ('14', 'Настасья', 'strt1', '17:20:00', '2026-03-23', '0');
+INSERT INTO `mydb`.`deliveries` (`order_id`, `fio`, `adress`, `time`, `date`, `confirm`) VALUES ('15', 'Никодим Лесоповал', 'strt2', '17:20:00', '2026-03-23', '0');
+```
+
+Попробую удалить пользователя Виктор, о нем есть связанные данные в таблицах orders и deliveries  
+```sql
+DELETE FROM `mydb`.`users` WHERE (`id` = '1');
+```
+Результат: СУБД заблокировала удаление и выдала ошибку Foreign Key Constraint Fail:  
+[![image.png](https://i.postimg.cc/bJh1QKm6/image.png)](https://postimg.cc/p9s9v1b8)  
+Поскольку в настройках связей (Foreign Keys) мы везде оставляли значение ON DELETE NO ACTION (или RESTRICT), база данных запрещает удалять «родителя» (пользователя), пока у него есть «дети» (заказы).
